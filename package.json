@@ -1,0 +1,17 @@
+{
+  "name": "feedlistener",
+  "version": "0.1.0",
+  "description": "Polls Feeds at Set Intervals and Sends New Items to Discord",
+  "main": "index.js",
+  "scripts": {
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^7.4.1",
+    "discord.js": "^12.5.3",
+    "dotenv": "^10.0.0",
+    "rss-parser": "^3.12.0"
+  }
+}
