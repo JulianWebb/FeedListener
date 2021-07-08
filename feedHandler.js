@@ -9,25 +9,30 @@ class FeedHandler extends EventEmitter {
         this.name = name;
         if (!source) throw("Source Argument Required");
         this.source = source;
+
         this.interval = interval; // Default: hourly
         this.parser = new Parser();
-        this.latest = this.getLatestItem();
+        this.getLatestItem((item) => {
+            this.latest = item;
+        });
         
         this.setInterval = setInterval(()=> { 
-            this.getNewItems().forEach((item) => {
-                this.emit("newItem", item)
+            this.getNewItems(items => {
+                items.forEach((item) => {
+                    this.emit("newItem", item)
+                })
             })
         }, this.interval);
     }
 
-    getLatestItem() {
+    getLatestItem(callback) {
         this.parser.parseURL(this.source, (error, feed) => {
             if (error) return console.error(error);
-            return feed.items[0];
+            callback(feed.items[0]);
         })
     }
 
-    getNewItems() {
+    getNewItems(callback) {
         console.log(`Checking '${this.name}' for new items`)
         this.parser.parseURL(this.source, (error, feed) => {
             if (error) return console.error(this.name + " " + error);
@@ -39,7 +44,7 @@ class FeedHandler extends EventEmitter {
             }
             this.latest = feed.items[0];
             
-            return newItems.reverse();
+            callback(newItems.reverse());
         })
     }
 }
