@@ -1,40 +1,33 @@
-const Discord = require('discord.js');
+const { WebhookClient } = require('discord.js');
 
-module.exports = function(){
-    let webhook = new Discord.WebhookClient(process.env.log_webhook_id, process.env.log_webhook_token)
+function timestamp() {
+    let now = new Date();
+    let hour = now.getHours();
+    let minute = now.getMinutes();
+    let stringHour = hour > 9? hour: `0${hour}`;
+    let stringMinute = minute > 9? minute: `0${minute}`;
+    return `[${stringHour}:${stringMinute}]`;
+}
+
+module.exports = function(appName, webhookAuth){
+    let webhook = webhookAuth? new WebhookClient(webhookAuth.id, webhookAuth.token): undefined;
     let builtins = {
         log: console.log,
         warn: console.warn,
         error: console.error
     }
 
-    console.log = function() {
-        builtins.log.apply(console, arguments);
-        if (process.env.log_webhook) {
-            let message = [...arguments].reduce((accumulator, current) => {
-                return accumulator + current.toString() + "      ";
-            }, "");
-            webhook.send(`LOG: ${message}`);
-        }
-    }
+    for (let printFunction in builtins) {
+        console[printFunction] = function() {
+            let prefix = timestamp() + (appName? `[${appName}]`: '') + `[${printFunction.toUpperCase()}]`;
+            builtins[printFunction].apply(console, [prefix, ...arguments]);
+            if (webhook) {
+                let message = [...arguments].reduce((accumulator, current) => {
+                    return accumulator + current.toString() + "      ";
+                }, "").trim();
 
-    console.warn = function() {
-        builtins.warn.apply(console, arguments);
-        if (process.env.log_webhook) {
-            let message = [...arguments].reduce((accumulator, current) => {
-                return accumulator + current.toString() + "      ";
-            }, "");
-            webhook.send(`WARN: ${message}`);
-        }
-    }
-
-    console.error = function() {
-        builtins.error.apply(console, arguments);
-        if (process.env.log_webhook) {
-            let message = [...arguments].reduce((accumulator, current) => {
-                return accumulator + current.toString() + "      ";
-            }, "");
-            webhook.send(`ERROR: ${message}`);
+                webhook.send(`\`${prefix} ${message}\``);
+            }
         }
     }
 }

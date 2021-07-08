@@ -1,5 +1,5 @@
 require('dotenv').config();
-require('./logger')();
+require('./logger')("FeedListener", { id: process.env.log_webhook_id, token: process.env.log_webhook_token});
 
 const DatabaseHandler = require('./databaseHandler');
 const Database = new DatabaseHandler("database.sqlite");
