@@ -5,5 +5,5 @@ const DatabaseHandler = require('./databaseHandler');
 const Database = new DatabaseHandler("database.sqlite");
 const FeedListener = require("./feedListener");
 
-console.log("Starting Feed Listener");
+console.log("Starting");
 FeedListener(Database, { id: process.env.feed_webhook_id, token: process.env.feed_webhook_token });
