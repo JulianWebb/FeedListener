@@ -8,7 +8,7 @@ function millisecondsTilNextHour() {
 }
 
 class FeedHandler extends EventEmitter {
-    constructor(name, source, interval = 3600000) {
+    constructor(name, source, initialItem = {}, interval = 3600000) {
         super();
         if (!name) throw("Name Argument Required");
         this.name = name;
@@ -17,23 +17,17 @@ class FeedHandler extends EventEmitter {
 
         this.interval = interval; // Default: hourly
         this.parser = new Parser();
+
         this.getLatestItem((item) => {
-            this.latest = item;
+            this.latest = item.name == initialItem.name? item: initialItem;
+            this.getNewItems(this.emitItems);
         });
         
         setTimeout(() => {
-            this.getNewItems(items => {
-                items.forEach((item) => {
-                    this.emit("newItem", item)
-                })
-            })
+            this.getNewItems(this.emitItems);
 
             this.setInterval = setInterval(()=> { 
-                this.getNewItems(items => {
-                    items.forEach((item) => {
-                        this.emit("newItem", item)
-                    })
-                })
+                this.getNewItems(this.emitItems)
             }, this.interval);
         }, millisecondsTilNextHour());
         
@@ -76,6 +70,12 @@ class FeedHandler extends EventEmitter {
             // 0+ for a,b order
             // Why they could just do a boolean like normal I have no idea
             return -1*(publishDateA > publishDateB)
+        })
+    }
+
+    emitItems(items) {
+        items.forEach((item) => {
+            this.emit("newItem", item)
         })
     }
 }
