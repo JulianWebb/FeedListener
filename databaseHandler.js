@@ -11,7 +11,8 @@ class DatabaseHandler {
                 "source"	TEXT NOT NULL,
                 "enabled"	INTEGER DEFAULT 0,
                 "nsfw"	INTEGER DEFAULT 0,
-                "type"	TEXT DEFAULT 'rss'
+                "type"	TEXT DEFAULT 'rss',
+                "latest"	TEXT
             );`).run();
         }
 
@@ -67,6 +68,16 @@ class DatabaseHandler {
 
     tableExists(table) {
         return this.database.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='${table}';`).get()? true: false;
+    }
+
+    setLatest(feed, latest) {
+        return this.database.prepare(`UPDATE feeds SET latest='${latest}' WHERE name='${feed}';`).run()? true: false;
+    }
+
+    getLatest(feed) {
+        let statement = this.database.prepare(`SELECT latest FROM feeds WHERE name='${feed}'`);
+        let result = statement.get();
+        return result.latest;
     }
 }
 
