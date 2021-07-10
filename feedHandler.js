@@ -20,14 +20,14 @@ class FeedHandler extends EventEmitter {
 
         this.getLatestItem((item) => {
             this.latest = item.name == initialItem.name? item: initialItem;
-            this.getNewItems(this.emitItems);
+            this.getNewItems(this.emitItems.bind(this));
         });
         
         setTimeout(() => {
-            this.getNewItems(this.emitItems);
+            this.getNewItems(this.emitItems.bind(this));
 
             this.setInterval = setInterval(()=> { 
-                this.getNewItems(this.emitItems)
+                this.getNewItems(this.emitItems.bind(this))
             }, this.interval);
         }, millisecondsTilNextHour());
         
