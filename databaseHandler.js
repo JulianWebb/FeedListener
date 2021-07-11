@@ -39,7 +39,7 @@ class DatabaseHandler {
 
         try {
             this.database.prepare(`INSERT INTO feeds (name, source, enabled, nsfw, type) 
-                VALUES ('${name}', '${source}', '${options.enabled}', '${options.nsfw}', '${options.type}')`).run();
+                VALUES ('${this.sanitize(name)}', '${this.sanitize(source)}', '${this.sanitize(options.enabled)}', '${this.sanitize(options.nsfw)}', '${this.sanitize(options.type)}')`).run();
             return true;
         } catch( exception ) {
             if (exception instanceof SQLite3.SqliteError) {
@@ -53,11 +53,11 @@ class DatabaseHandler {
 
 
     getFeedByName(name) {
-        return this.database.prepare(`SELECT * FROM feeds WHERE name='${name}';`).get();
+        return this.database.prepare(`SELECT * FROM feeds WHERE name='${this.sanitize(name)}';`).get();
     }
 
     getFeedBySource(source) {
-        return this.database.prepare(`SELECT * FROM feeds WHERE source='${source}';`).get();
+        return this.database.prepare(`SELECT * FROM feeds WHERE source='${this.sanitize(source)}';`).get();
     }
 
     getFeeds() {
@@ -67,17 +67,21 @@ class DatabaseHandler {
     getConfig(key) {}
 
     tableExists(table) {
-        return this.database.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='${table}';`).get()? true: false;
+        return this.database.prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='${this.sanitize(table)}';`).get()? true: false;
     }
 
     setLatest(feed, latest) {
-        return this.database.prepare(`UPDATE feeds SET latest='${latest}' WHERE name='${feed}';`).run()? true: false;
+        return this.database.prepare(`UPDATE feeds SET latest='${this.sanitize(latest)}' WHERE name='${this.sanitize(feed)}';`).run()? true: false;
     }
 
     getLatest(feed) {
-        let statement = this.database.prepare(`SELECT latest FROM feeds WHERE name='${feed}'`);
+        let statement = this.database.prepare(`SELECT latest FROM feeds WHERE name='${this.sanitize(feed)}'`);
         let result = statement.get();
         return result.latest;
+    }
+
+    sanitize(value) {
+        return value.replace(/\'/g, "''");
     }
 }
 
