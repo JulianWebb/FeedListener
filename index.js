@@ -7,4 +7,9 @@ const Database = new DatabaseHandler("database.sqlite");
 const FeedListener = require("./feedListener");
 
 console.log(`Starting ${packageInfo.name} v${packageInfo.version}`);
-FeedListener(Database, { id: process.env.feed_webhook_id, token: process.env.feed_webhook_token });
+try {
+    FeedListener(Database, { id: process.env.feed_webhook_id, token: process.env.feed_webhook_token });
+} catch (exception) {
+    console.error(`<@${process.env.notify_id}> ${exception}`);
+}
+
