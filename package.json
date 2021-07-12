@@ -2,7 +2,7 @@
   "name": "FeedListener",
   "version": "0.1.0",
   "description": "Polls Feeds at Set Intervals and Sends New Items to Discord",
-  "main": "index.js",
+  "main": "output/index.js",
   "scripts": {
   },
   "keywords": [],
