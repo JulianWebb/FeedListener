@@ -1,5 +1,5 @@
 require('dotenv').config();
-const packageInfo = require('./package.json');
+const packageInfo = require('../package.json');
 require('./logger')(packageInfo.name, { id: process.env.log_webhook_id, token: process.env.log_webhook_token});
 
 const DatabaseHandler = require('./databaseHandler');
